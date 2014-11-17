@@ -1,0 +1,5 @@
+include_rules
+
+: sources/<submodules> | nnb/<nnb> |> ^ Compiling $(APP).exe^ g++ $(LIB_DIRS) $(INCLUDE_DIRS) %<submodules> $(LIBS) -o %o |> bin/$(APP).exe <output>
+
+.gitignore

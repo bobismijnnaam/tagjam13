@@ -1,0 +1,122 @@
+// External includes
+#include <iostream>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+
+// Personal includes
+#include "gamestates/gsMain.hpp"
+#include "gamestates/gsGame.hpp"
+#include "main/global.hpp"
+#include "nnb/log/log.hpp"
+#include "nnb/states/StateFactory.hpp"
+#include "nnb/states/StateMachine.hpp"
+
+int init();
+int game();
+int cleanup();
+
+int main(int argc, char* args[]) {
+
+	int errorCode = init();
+	if (errorCode > 0) {
+		NNB_LOG << "An error occurred while initializing. Code: " << errorCode;
+		return errorCode;
+	}
+
+	game();
+
+	cleanup();
+	
+	return 0;
+}
+
+/**
+ * Initializes SDL, among others. Could be in a separate state but ah well.
+ * @return Errorcode indicating which part of the initialization went wrong
+ */
+int init() {
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		NNB_LOG << "SDL could not initialize. SDL error: " << SDL_GetError();
+		return 1;
+	}
+
+	g_window = SDL_CreateWindow("Stormnado", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCR_W, SCR_H, SDL_WINDOW_SHOWN);
+	if (g_window == NULL) {
+		NNB_LOG << "Window could not be created. SDL error: " << SDL_GetError();
+		SDL_Quit();
+		return 2;
+	}
+
+	g_windowSurface = SDL_GetWindowSurface(g_window);
+	g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+	if (TTF_Init() == -1) {
+		NNB_LOG << "SDL_TTF could not be initialized. TTF error: " << TTF_GetError();
+		SDL_DestroyWindow(g_window);
+		SDL_Quit();
+		return 3;
+	}
+
+	if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
+		NNB_LOG << "SDL_IMG could not be initialized. IMG error: " << IMG_GetError();
+		TTF_Quit();
+		SDL_DestroyWindow(g_window);
+		SDL_Quit();
+		return 4;
+	}
+
+	g_gm = new nnb::StateMachine();
+	g_gm->addState<gsMain>("main");
+	g_gm->addState<gsGame>("game");
+
+	// Load font
+	proggyClean = TTF_OpenFont("media/fonts/ProggyClean.ttf", 12);
+	proFont = TTF_OpenFont("media/fonts/ProFontWindows.ttf", 30);
+	proFontSmall = TTF_OpenFont("media/fonts/ProFontWindows.ttf", 12);
+	proFontMedium = TTF_OpenFont("media/fonts/ProFontWindows.ttf", 20);
+	proFontBig = TTF_OpenFont("media/fonts/ProFontWindows.ttf", 120);
+
+	// To make it possible to receive text input events
+	SDL_StartTextInput();
+
+	NNB_LOG << "Initialization complete";
+
+	return 0;
+}
+
+int game() {
+	// Set the current state to main
+	g_gm->changeState(nnb::StateAction::SET, "game");
+	g_gm->update();
+
+	while (g_gm->getCurrentStateID() != nnb::StateMachine::STATE_EXIT) {
+		g_gm->update();
+	}
+
+	return 0;
+}
+
+int cleanup() {
+	delete g_gm;
+	g_gm = NULL;
+
+	// To close the text input thingy... Not sure if it's needed but it probably doesn't hurt
+	SDL_StopTextInput();
+
+	SDL_DestroyWindow(g_window);
+	
+	TTF_CloseFont(proggyClean);
+	TTF_CloseFont(proFont);
+	TTF_CloseFont(proFontSmall);
+	TTF_CloseFont(proFontMedium);
+	TTF_CloseFont(proFontBig);
+
+	TTF_Quit();
+
+	IMG_Quit();
+
+	SDL_Quit();
+
+	return 0;
+}

@@ -1,0 +1,67 @@
+// Author: Bob Rubbens - Knights of the Compiler
+// Creation date: ma 08-08-2014
+// Contact: http://plusminos.nl - @broervanlisa - gmail (bobrubbens)
+
+// Public
+#include <cmath>
+#include <Eigen/Dense>
+#include <iostream>
+#include <SDL2/SDL.h>
+#include <string>
+#include <vector>
+
+// Private
+#include "gamestates/gsGame.hpp"
+#include "main/global.hpp"
+#include "nnb/states/GameState.hpp"
+#include "nnb/log/log.hpp"
+#include "nnb/utils/constants.hpp"
+
+gsGame::gsGame() {
+	
+}
+
+gsGame::~gsGame() {
+
+}
+
+void gsGame::event(SDL_Event& e) {
+	
+	switch (e.type) {
+		case SDL_QUIT:
+			g_gm->changeState(nnb::StateAction::SET, nnb::StateMachine::STATE_EXIT);
+			NNB_LOG << "Exit was requested";
+			break;
+		case SDL_MOUSEBUTTONUP:
+			NNB_LOG << "Mouse button was pressed at (" << e.button.x << "; " << e.button.y << ")";
+			break;
+		default:
+			break;
+	}
+
+}
+
+void gsGame::logic(float delta) {
+	
+}
+
+void gsGame::render() const {
+	SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255);
+	SDL_RenderClear(g_renderer);
+
+	SDL_RenderPresent(g_renderer);
+}
+
+void gsGame::activate() {
+	stateStart = SDL_GetTicks();
+	NNB_LOG << "main activated";
+}
+
+void gsGame::deactivate() {
+	NNB_LOG << "main deactivated";
+}
+
+std::string gsGame::getID() {
+	return "main";
+}
+

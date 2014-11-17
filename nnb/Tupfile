@@ -1,0 +1,5 @@
+include_rules
+
+: <modules> |> ^ Creating static library Nuts 'n Bolts^ ar -rvsc %o %<modules>  |> bin/libnutsnbolts.a <nnb>
+
+.gitignore

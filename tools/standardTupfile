@@ -1,0 +1,7 @@
+include_rules
+
+# : *.cpp |> !ctoo |>
+: foreach *.cpp |> !cc |>
+# : build/*.o |> !lnk |>
+
+.gitignore

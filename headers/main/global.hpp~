@@ -1,0 +1,41 @@
+// Author: Bob Rubbens - Knights of the Compiler
+// Creation date: ma 21-07-2014
+// Contact: http://plusminos.nl - @broervanlisa - gmail (bobrubbens)
+
+#ifndef GLOBAL_HPP
+#define GLOBAL_HPP
+
+// Public
+#include <chrono>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <random>
+#include <vector>
+
+// Private
+#include "nnb/states/StateMachine.hpp"
+
+// Screen dimensions
+const int SCR_W = 640;
+const int SCR_H = 480;
+
+// Global vars for rendering
+extern SDL_Window *g_window;
+extern SDL_Surface *g_windowSurface;
+extern SDL_Renderer *g_renderer;
+
+// Global fonts
+extern TTF_Font *proggyClean;
+extern TTF_Font *proFont;
+extern TTF_Font *proFontSmall;
+extern TTF_Font *proFontMedium;
+
+// Word list for in the game
+extern std::vector<std::string> words;
+
+// Global game state machine instance
+extern nnb::StateMachine *g_gm;
+
+extern std::mt19937 randgen;
+
+#endif
